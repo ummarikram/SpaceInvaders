@@ -7,23 +7,8 @@
 #define COL 80
 using namespace std;
 
-HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);        // Part of the Font Size Adjustement Function.
-
-HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);     // Part of the Font Color Function.
-
 // Global Variable.
 bool GameContinue = true;
-
-// Font Size Adjustment.
-void fontsize(int a, int b)
-{
-	PCONSOLE_FONT_INFOEX lpConsoleCurrentFontEx = new CONSOLE_FONT_INFOEX();
-	lpConsoleCurrentFontEx->cbSize = sizeof(CONSOLE_FONT_INFOEX);
-	GetCurrentConsoleFontEx(out, 0, lpConsoleCurrentFontEx);
-	lpConsoleCurrentFontEx->dwFontSize.X = a;     // Width(Pixel) of Font.
-	lpConsoleCurrentFontEx->dwFontSize.Y = b;     // Height(Pixel) of Font.
-	SetCurrentConsoleFontEx(out, 0, lpConsoleCurrentFontEx);
-}
 
 //2-D Array used to Initialize World that works at back end.
 char World[ROWS][COL] = {
@@ -57,10 +42,7 @@ char World[ROWS][COL] = {
 // Shapes Initializer.
 void ShapeInitialize(int i, int Lives)
 {
-	HWND console = GetConsoleWindow();                          // Fixing console windwow dimension to avoid shapes being dispersed on different computers.
-	RECT ConsoleRect;
-	GetWindowRect(console, &ConsoleRect);
-	MoveWindow(console, ConsoleRect.left, ConsoleRect.top, 666, 380, TRUE);            // Width=666 , Height=380
+	SetConsoleWindowDimensions(666, 380);
 
 	// Player.
 	if (Lives != 0)
@@ -248,16 +230,16 @@ void OutputMessage(int Score, int Lives, int EnemyCount)
 {
 	if (Lives > 0 && EnemyCount == 0)      // If Player Wins
 	{
-		cout << endl << endl << endl << "                            Well Played!        " << endl << endl;                 // Message to Player At End.
+		cout << "\n\n\n                            Well Played!        \n\n";      // Message to Player At End.
 
-		cout << endl << endl << endl << endl << "                                       Your Score is : " << Score << endl << endl << endl << endl;                    // Display Score At End.
+		cout << "\n\n\n                                       Your Score is : " << Score << "\n\n\n\n";   // Display Score At End.
 
 	}
 	else           // If Player Loses or Quits.
 	{
-		cout << endl << endl << endl << endl << "                Better Luck Next Time!        " << endl << endl;                 // Message to Player At End.
+		cout << "\n\n\n\n                Better Luck Next Time!        \n\n";    // Message to Player At End.
 
-		cout << endl << endl << endl << endl << "                                       Your Score is : " << Score << endl << endl << endl;                    // Display Score At End.
+		cout << "\n\n\n\n                                       Your Score is : " << Score << "\n\n\n";      // Display Score At End.
 
 	}
 }
@@ -310,7 +292,8 @@ void LaserControl(Player& P, Enemy& E, int Difficulty)
 	{
 		for (int y = ROWS - 1; y > 0; y--)
 		{
-			if (World[y][x] == E.EnemyLaser && (World[y + 1][x] == P.PlayerLaser))     // Checks if Enemy Laser is Above Player Laser, if True then Both Laser Disappear.
+			// Checks if Enemy Laser is Above Player Laser, if True then Both Laser Disappear.
+			if (World[y][x] == E.EnemyLaser && (World[y + 1][x] == P.PlayerLaser))     
 			{
 				World[y][x] = ' ';                // Enemy Laser Disappear.
 
@@ -335,7 +318,8 @@ void LaserControl(Player& P, Enemy& E, int Difficulty)
 
 			}
 
-			else if (World[y][x] == P.Player1 && World[y - 1][x] == E.EnemyLaser)   // Checks if Player is Below Enemy Laser, if True then Enemy Laser Disappear & Player Lives Decrease. 
+			// Checks if Player is Below Enemy Laser, if True then Enemy Laser Disappear & Player Lives Decrease. 
+			else if (World[y][x] == P.Player1 && World[y - 1][x] == E.EnemyLaser)   
 			{
 				World[y - 1][x] = ' ';   // Enemy Laser Disappear.
 
@@ -357,7 +341,8 @@ void LaserControl(Player& P, Enemy& E, int Difficulty)
 	{
 		for (int y = 0; y < ROWS; y++)
 		{
-			if (World[y][x] == P.PlayerLaser && World[y - 1][x] == E.EnemyLaser)  // Checks if Enemy Laser is Above Player Laser, if True then Both Laser Disappear.
+			// Checks if Enemy Laser is Above Player Laser, if True then Both Laser Disappear.
+			if (World[y][x] == P.PlayerLaser && World[y - 1][x] == E.EnemyLaser)  
 			{
 				World[y][x] = ' ';            // Player Laser Disappear.
 
@@ -367,7 +352,8 @@ void LaserControl(Player& P, Enemy& E, int Difficulty)
 
 			}
 
-			else if (World[y][x] == E.EnemyLaser && World[y + 1][x] == P.Player1)  // Checks if Player is Below Enemy Laser, if True then Enemy Laser Disappear & Player Lives Decrease. 
+			// Checks if Player is Below Enemy Laser, if True then Enemy Laser Disappear & Player Lives Decrease. 
+			else if (World[y][x] == E.EnemyLaser && World[y + 1][x] == P.Player1)  
 			{
 				World[y][x] = ' ';         // Enemy Laser Disappears.
 
@@ -409,8 +395,9 @@ void LaserControl(Player& P, Enemy& E, int Difficulty)
 
 			else if (Difficulty == '1')     // Easy Difficulty.
 			{
+				// Random Shooting Time for Enemy.
 				if (((World[y][x] == E.Enemy1 && World[y][x + 1] == E.Enemy1 && World[y][x + 2] == E.Enemy1)) &&
-					(rand() % 9) == 2 && (rand() % 9) == 3 && (rand() % 2) == 0 && World[y + 1][x] != P.PlayerLaser)           // Random Shooting Time for Enemy.
+					(rand() % 9) == 2 && (rand() % 9) == 3 && (rand() % 2) == 0 && World[y + 1][x] != P.PlayerLaser)           
 				{
 					for (int NewH = y + 1; NewH < ROWS; NewH++)        // Loop to Control Enemy Laser if Another Enemy is Below.
 					{
@@ -500,7 +487,8 @@ void PlayerMovement(Player& P, char& Key)
 	{
 		for (int x = 2; x < COL - 2; x++)         // Loop through Positive X-Axis.
 		{
-			if (World[ROWS - 1][x] == P.Player1 && World[ROWS - 1][x + 1] == P.Player1 && World[ROWS - 1][x + 2] == P.Player1)        // Checks Current Position of Player.
+			// Checks Current Position of Player.
+			if (World[ROWS - 1][x] == P.Player1 && World[ROWS - 1][x + 1] == P.Player1 && World[ROWS - 1][x + 2] == P.Player1)        
 			{
 				World[ROWS - 1][x - 1] = P.Player1;               // Store Player in Previous Positions.
 
@@ -521,7 +509,8 @@ void PlayerMovement(Player& P, char& Key)
 	{
 		for (int x = COL - 4; x > 0; x--)       // Loop through Negative X-Axis.
 		{
-			if (World[ROWS - 1][x] == P.Player1 && World[ROWS - 1][x - 1] == P.Player1 && World[ROWS - 1][x - 2] == P.Player1)    // Checks Current Position of Player.
+			// Checks Current Position of Player.
+			if (World[ROWS - 1][x] == P.Player1 && World[ROWS - 1][x - 1] == P.Player1 && World[ROWS - 1][x - 2] == P.Player1)    
 			{
 				World[ROWS - 1][x - 1] = P.Player1;      // Store Player in Forward Positions.
 
@@ -609,7 +598,8 @@ int main()
 
 	SetConsoleTextAttribute(hConsole, 55);  // Set Console Background to Blue & Text Color to White.
 
-	while (E.EnemyCount > 0 && GameContinue)        // Major Loop To Control Game, Terminates When Either All Enemies are Killed OR Player Lives are 0 OR Enemies Reach Player.
+	// Major Loop To Control Game, Terminates When Either All Enemies are Killed OR Player Lives are 0 OR Enemies Reach Player.
+	while (E.EnemyCount > 0 && GameContinue)        
 	{
 		E.EnemyDrop = 0;    // Enemy Drop Control Variable.
 

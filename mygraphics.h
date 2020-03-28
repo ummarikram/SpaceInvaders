@@ -3,6 +3,10 @@
 
 #include <windows.h>
 
+
+
+HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);     // Part of the Font Color Function.
+
 // function prototypes
 
 void drawLine(int x1,int y1,int x2,int y2,int colour); // draws a line between two points given their x-y coordinates in gray-scale
@@ -18,13 +22,8 @@ void getWindowDimensions(int& width, int& height); // gets width and height of t
 void getConsoleWindowDimensions(int& width, int& height); // gets width and height of console window (in character mode)
 void gotoxy(int x,int y); // sets console cursor on given x-y coordinates
 void showConsoleCursor(bool showFlag); // shows or hides the cursor
-
-
-
-
-
-
-
+void fontsize(int a, int b); // Font size adjustment
+void SetConsoleWindowDimensions(int a, int b); // Console window adjustment.
 
 
 
@@ -180,6 +179,26 @@ void showConsoleCursor(bool flag)
     GetConsoleCursorInfo(consoleHandle, &cursorInfo);
     cursorInfo.bVisible = flag; // show or hide if flag is true or false respectively
     SetConsoleCursorInfo(consoleHandle, &cursorInfo);
+}
+
+void fontsize(int a, int b)
+{
+	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+	PCONSOLE_FONT_INFOEX lpConsoleCurrentFontEx = new CONSOLE_FONT_INFOEX();
+	lpConsoleCurrentFontEx->cbSize = sizeof(CONSOLE_FONT_INFOEX);
+	GetCurrentConsoleFontEx(out, 0, lpConsoleCurrentFontEx);
+	lpConsoleCurrentFontEx->dwFontSize.X = a;     // Width(Pixel) of Font.
+	lpConsoleCurrentFontEx->dwFontSize.Y = b;     // Height(Pixel) of Font.
+	SetCurrentConsoleFontEx(out, 0, lpConsoleCurrentFontEx);
+}
+
+void SetConsoleWindowDimensions(int a, int b)
+{
+	HWND console = GetConsoleWindow();                          // Fixing console windwow dimension to avoid shapes being dispersed on different computers.
+	RECT ConsoleRect;
+	GetWindowRect(console, &ConsoleRect);
+	MoveWindow(console, ConsoleRect.left, ConsoleRect.top, a, b, TRUE);            // Width=666 , Height=380
+
 }
 
 #endif /* MYGRAPHICS_H_ */
